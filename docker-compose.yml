@@ -1,0 +1,116 @@
+# docker-compose.yml — CodeLabz
+#
+# TASK 2 — Dockerization
+#
+# THREE SERVICES:
+#   emulator  — Firebase Emulator Suite (Firestore, Auth, RTDB, Storage)
+#   app       — Vite dev server with HMR (depends on emulator being healthy)
+#   api       — Vercel dev server, mirrors production API routes (port 3001)
+#
+# IMPROVEMENTS OVER ORIGINAL:
+#   - Hardcoded "sleep 10" entrypoint replaced with Docker health check +
+#     depends_on condition: service_healthy — app won't start until Firestore
+#     emulator is actually ready to accept connections.
+#   - Three named services with clear port ownership instead of everything
+#     crammed into one container.
+#   - Named volume for emulator data so testdata persists across restarts.
+#   - node_modules excluded from bind mount (anon volume) to prevent host
+#     node_modules overwriting the container's correctly-built ones.
+#
+# USAGE:
+#   First time (or after dep changes):
+#     docker compose build
+#     docker compose up
+#
+#   Subsequent starts:
+#     docker compose up
+#
+#   Production image only:
+#     docker build --target production -t codelabz:prod .
+#     docker run -p 80:80 --env-file .env codelabz:prod
+
+services:
+
+  # ── Firebase Emulator Suite ────────────────────────────────────────────────
+  emulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    command: >
+      firebase emulators:start
+        --import=./testdata
+        --export-on-exit=./testdata
+        --project demo-codelabz
+    ports:
+      - "4000:4000"   # Emulator UI
+      - "8080:8080"   # Firestore
+      - "9099:9099"   # Auth
+      - "9000:9000"   # Realtime Database
+      - "9199:9199"   # Storage
+      - "8085:8085"   # PubSub
+      - "5001:5001"   # Functions
+      - "5000:5000"   # Hosting emulator
+      - "4400:4400"   # Emulator Hub
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/functions/node_modules
+      - emulator_data:/app/testdata
+    env_file:
+      - .env.local
+    # Health check: poll the Firestore emulator REST endpoint
+    # App and API services won't start until this returns 200
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider",
+             "http://localhost:8080"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  # ── Vite Dev Server ────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules       # anonymous volume — keeps container node_modules
+    env_file:
+      - .env.local
+    environment:
+      - VITE_APP_USE_EMULATOR=true
+    depends_on:
+      emulator:
+        condition: service_healthy   # waits for Firestore to be ready
+    stdin_open: true
+    tty: true
+
+  # ── Vercel API Dev Server ──────────────────────────────────────────────────
+  # Mirrors production Vercel serverless functions locally
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    command: npx vercel dev --listen 0.0.0.0:3001 --yes
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
+    depends_on:
+      emulator:
+        condition: service_healthy
+
+# ── Named volumes ──────────────────────────────────────────────────────────────
+volumes:
+  emulator_data:
+    driver: local
