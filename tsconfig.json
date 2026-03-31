@@ -1,0 +1,66 @@
+{
+  "compilerOptions": {
+    /* â”€â”€ Language & Environment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    "target":    "ES2020",
+    "lib":       ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx":       "react-jsx",
+    "module":    "ESNext",
+    "moduleResolution": "bundler",
+
+    /* â”€â”€ Strictness â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    "strict":                        true,
+    "noUnusedLocals":                false,
+    "noUnusedParameters":            false,
+    "noImplicitReturns":             true,
+    "noFallthroughCasesInSwitch":    true,
+
+    /* â”€â”€ Incremental migration: allow JS files to coexist â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* Set both to true so existing .js/.jsx files are checked but not      */
+    /* forced to be TypeScript â€” rename files to .ts/.tsx progressively.    */
+    "allowJs":   true,
+    "checkJs":   false,
+
+    /* â”€â”€ Interop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    "esModuleInterop":    true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule":  true,
+    "isolatedModules":    true,
+
+    /* â”€â”€ Output â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* noEmit: true â€” Vite handles transpilation; tsc is type-checker only  */
+    "noEmit":    true,
+
+    /* â”€â”€ Path aliases (must match vite.config.js resolve.alias) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    /* â”€â”€ Declaration files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+
+    /* â”€â”€ Source maps (for debugging in dev) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    "sourceMap": true,
+
+    /* â”€â”€ Skip type checking of external declaration files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* Required for firebase/compat SDK and a few other packages that ship  */
+    /* with slightly incompatible .d.ts files.                               */
+    "skipLibCheck": true
+  },
+
+  /* Files to include in type checking */
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/types/**/*.d.ts"
+  ],
+
+  /* Exclude build output and external dependencies */
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "functions",
+    "cypress"
+  ]
+}
